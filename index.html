@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />  
+<title>PowerBI Vault</title>
+
+<!-- BASE URL PARA GITHUB PAGES -->
+<base href="/construtorapride-/">
+
+<style>
+  html, body { height: 100%; margin: 0; font-family: Arial, sans-serif; }
+  #matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #082B4F; z-index: -1; }
+  body { display: flex; justify-content: center; align-items: center; }
+
+  #loginBox { width: 350px; background: rgba(255,255,255,0.95); padding: 20px 15px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); box-sizing: border-box; text-align: center; }
+  #loginBox img { width: 200px; margin-bottom: 10px; }
+  #loginBox h3 { margin: 5px 0 15px 0; font-size: 18px; font-weight: 500; color: #082B4F; }
+  #loginBox h2 { margin-bottom: 15px; font-size: 22px; font-weight: 600; color: #082B4F; }
+  #loginBox input { width: 90%; padding: 10px 12px; font-size: 15px; margin-top: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; outline: none; transition: border 0.2s; }
+  #loginBox input:focus { border-color: #0078D4; }
+  #loginBox button { width: 30%; padding: 10px 0; margin: 15px auto 0 auto; font-size: 16px; font-weight: bold; border-radius: 6px; background: #0078D4; color: white; border: none; cursor: pointer; transition: background 0.2s; }
+  #loginBox button:hover { background: #005fa3; }
+  #forgot { margin-top: 10px; font-size: 14px; color: #005fa3; cursor: pointer; text-decoration: underline; }
+
+  .password-container { position: relative; width: 100%; margin: 10px auto 0 auto; }
+  .password-container input { width: 100%; padding: 10px 35px 10px 12px; font-size: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
+  .togglePassword { position: absolute; top: 50%; right:20px; transform: translateY(-40%); cursor: pointer; font-size: 18px; color: #555; user-select: none; }
+
+  #linksBox { position: relative; width: 600px; background: rgba(0, 50, 100, 0.95); padding: 100px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.3); max-height: 500px; overflow-y: auto; display: none; }
+  #linksBox h2 { text-align: center; position: relative; top: -40px; color: #ddd9ce; }
+  input, button { width: 94%; padding: 12px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+  button { cursor: pointer; background: #0078D4; color: white; border: none; font-weight: bold; }
+  button:hover { background: #005fa3; }
+  #linksBox button { width: 200px; display: block; margin: 10px auto 0 auto; padding: 6px 12px; }
+
+  .item { background: #e8f0fe; padding: 15px; margin-top: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.1s, box-shadow 0.2s; display: flex; align-items: center; justify-content: space-between; }
+  .item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+  .deleteBtn { background: #ff4c4c; border: none; color: white; padding: 4px 6px; border-radius: 4px; cursor: pointer; width: 80px !important; min-width: 60px !important; text-align: center; line-height: 1; font-size: 14px; }
+  .deleteBtn:hover { background: #e04343; }
+  .abrirBtn { background: #0078D4; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; font-weight: bold; display: flex; align-items: center; }
+
+  #logoutBtn { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); width: 200px; background: #d9534f; }
+  #logoutBtn:hover { background: #c9302c; }
+
+  #newTitulo, #newLink { display: block; margin-left: auto; margin-right: auto; width: 80% !important; }
+
+  #viewerFull { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; }
+  #viewerFull iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+  #closeViewer { position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%); width: 10000px; padding: 17px 0px; background: #082A48; border: none; color: white; font-size: 16px; border-radius: 6px; cursor: pointer; z-index: 10000; }
+  #closeViewer:hover { background: #005fa3; }
+  #fullscreenBtn { position: fixed; top: -5px; right: 8px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.4); color: white; border: none; font-size: 18px; cursor: pointer; z-index: 10001; display: flex; justify-content: center; align-items: center; transition: background 0.2s; }
+  #fullscreenBtn:hover { background: rgba(0,0,0,0.6); }
+</style>
+</head>
+<body>
+
+<canvas id="matrixCanvas"></canvas>
+
+<div id="loginBox">
+  <img src="https://construtorapride.saxxes.com.br/assets/logo/pride/logo200x200.svg" alt="Logo Pride" style="margin-left: -25px;"> 
+  <h3 style="text-align: center; margin: -30px 0 50px 0; font-size: 20px; font-weight: 600; color: #082B4F;">Indicadores PCP</h3>
+  <h2>Login</h2>
+  <input id="user" placeholder="Email">
+  <div class="password-container">
+    <input id="pass" type="password" placeholder="Senha" style="padding: 6px 35px 6px 12px; font-size: 14px;"> 
+    <span class="togglePassword" onclick="togglePassword()">👀</span>
+  </div>
+  <button onclick="login()">Entrar</button>
+  <div id="forgot" onclick="forgotPassword()">Esqueci a senha</div>
+</div>
+
+<div id="linksBox">
+  <h2>Bem-vindo!</h2>
+  <input id="newTitulo" placeholder="Título do relatório">
+  <input id="newLink" placeholder="Link do Power BI">
+  <button onclick="addLink()">Adicionar Link</button>
+  <div id="listaLinks"></div>
+  <button id="logoutBtn" onclick="logoutLinks()">Sair</button>
+</div>
+
+<div id="viewerFull">
+  <iframe id="viewerFrame"></iframe>
+  <button id="closeViewer" onclick="fecharViewer()">Fechar</button>
+</div>
+
+<button id="fullscreenBtn" onclick="toggleFullscreen()">⛶</button>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, sendPasswordResetEmail, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, getDocs, orderBy, query, doc, deleteDoc, where 
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDyTenanyTtr4bfLTxbvytYuVWSbibSXtQ",
+  authDomain: "indicadores-pcp.firebaseapp.com",
+  projectId: "indicadores-pcp",
+  storageBucket: "indicadores-pcp.appspot.com",
+  messagingSenderId: "719598240570",
+  appId: "1:719598240570:web:d215ad7bd3abc09a91c603",
+  measurementId: "G-3XLNR6XBWF"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+async function login() {
+  const email = document.getElementById("user").value.trim();
+  const senha = document.getElementById("pass").value;
+
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("linksBox").style.display = "block";
+
+    // 🔥 CORRIGIDO: Removido mostrarLinks() aqui.
+    
+  } catch(err) {
+    alert("Usuário ou senha incorretos.");
+    console.error(err);
+  }
+}
+
+async function logoutLinks() {
+  await signOut(auth);
+  document.getElementById("linksBox").style.display = "none";
+  document.getElementById("loginBox").style.display = "block";
+  document.getElementById("user").value = "";
+  document.getElementById("pass").value = "";
+}
+
+function togglePassword() {
+  const pass = document.getElementById("pass");
+  pass.type = pass.type === "password" ? "text" : "password";
+}
+
+async function forgotPassword() {
+  const email = document.getElementById("user").value.trim();
+  if (!email) return alert("Digite seu email para recuperar a senha.");
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Email de redefinição enviado!");
+  } catch(err) {
+    alert("Erro: " + err.message);
+  }
+}
+
+async function mostrarLinks() {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const area = document.getElementById("listaLinks");
+  area.innerHTML = "";
+
+  // 🔹 Lista de usuários especiais e os links que podem ver
+  const specialUsers = {
+    "charles.farias@construtorapride.com.br": ["Controladoria"]
+  };
+
+  const q = query(collection(db, "links"), orderBy("titulo"));
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach(docSnap => {
+    const l = docSnap.data();
+
+    // 🔹 Filtra links se for usuário especial
+    if (specialUsers[user.email] && !specialUsers[user.email].includes(l.titulo)) {
+      return; // pula links que o usuário especial não deve ver
+    }
+
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const containerTitulo = document.createElement("div");
+    containerTitulo.style.display = "flex";
+    containerTitulo.style.alignItems = "center";
+
+    const logo = document.createElement("img");
+    logo.src = "https://pragmaticworks.com/hs-fs/hubfs/Microsoft-Power-BI-Symbol.png?width=500&height=500&name=Microsoft-Power-BI-Symbol.png";
+    logo.alt = "Power BI";
+    logo.style.width = "25px";
+    logo.style.height = "25px";
+    logo.style.marginRight = "10px";
+
+    const titulo = document.createElement("strong");
+    titulo.textContent = l.titulo;
+
+    containerTitulo.appendChild(logo);
+    containerTitulo.appendChild(titulo);
+    div.appendChild(containerTitulo);
+
+    const abrirBtn = document.createElement("a");
+    abrirBtn.href = "javascript:void(0)";
+    abrirBtn.textContent = "Abrir Relatório";
+    abrirBtn.className = "abrirBtn";
+    abrirBtn.onclick = () => abrirViewer(l.link);
+    div.appendChild(abrirBtn);
+
+    area.appendChild(div);
+  });
+
+  // 🔹 Oculta campos de adicionar link para todos (por enquanto)
+  document.querySelector("#newTitulo").style.display = "none";
+  document.querySelector("#newLink").style.display = "none";
+  document.querySelector("#linksBox button[onclick='addLink()']").style.display = "none";
+}
+
+
+
+
+
+
+
+async function addLink() {
+  const titulo = document.getElementById("newTitulo").value.trim();
+  const link = document.getElementById("newLink").value.trim();
+
+  if (!titulo || !link) return alert("Preencha título e link!");
+
+  await addDoc(collection(db, "links"), { titulo, link });
+
+  document.getElementById("newTitulo").value = "";
+  document.getElementById("newLink").value = "";
+
+  mostrarLinks();
+}
+
+function abrirViewer(url) {
+  const v = document.getElementById("viewerFull");
+  const f = document.getElementById("viewerFrame");
+
+  f.src = url;
+  v.style.display = "block";
+}
+
+function fecharViewer() {
+  const v = document.getElementById("viewerFull");
+  const f = document.getElementById("viewerFrame");
+
+  f.src = "";
+  v.style.display = "none";
+}
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else if (document.exitFullscreen) {
+    document.exitFullscreen();
+  }
+}
+
+const canvasMatrix = document.getElementById('matrixCanvas');
+const ctx = canvasMatrix.getContext('2d');
+const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%';
+const fontSize = 18;
+let columns = Math.floor(window.innerWidth / fontSize);
+let drops = Array(columns).fill(0);
+
+function drawMatrix() {
+  ctx.fillStyle = 'rgba(8,43,79,0.05)';
+  ctx.fillRect(0, 0, canvasMatrix.width, canvasMatrix.height);
+
+  for (let i = 0; i < drops.length; i++) {
+    const text = letters[Math.floor(Math.random() * letters.length)];
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvasMatrix.height);
+    gradient.addColorStop(0, '#00f5ff');
+    gradient.addColorStop(0.5, '#00a1ff');
+    gradient.addColorStop(1, '#0078D4');
+
+    ctx.fillStyle = gradient;
+    ctx.font = fontSize + 'px monospace';
+    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+    if (drops[i] * fontSize > canvasMatrix.height && Math.random() > 0.95)
+      drops[i] = 0;
+
+    drops[i]++;
+  }
+
+  requestAnimationFrame(drawMatrix);
+}
+
+function resizeMatrix() {
+  canvasMatrix.width = window.innerWidth;
+  canvasMatrix.height = window.innerHeight;
+
+  columns = Math.floor(canvasMatrix.width / fontSize);
+  drops = Array(columns).fill(0);
+}
+
+window.addEventListener('resize', resizeMatrix);
+resizeMatrix();
+drawMatrix();
+
+onAuthStateChanged(auth, user => {
+  if (user) mostrarLinks();
+});
+
+window.login = login;
+window.logoutLinks = logoutLinks;
+window.togglePassword = togglePassword;
+window.forgotPassword = forgotPassword;
+window.addLink = addLink;
+window.fecharViewer = fecharViewer;
+window.toggleFullscreen = toggleFullscreen;
+window.abrirViewer = abrirViewer;
+window.mostrarLinks = mostrarLinks;
+
+</script>
+
+</body>
+</html>
