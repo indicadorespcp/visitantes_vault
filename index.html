@@ -8,55 +8,183 @@
 <base href="/construtorapride-/">
 
 <style>
-  html, body { height: 100%; margin: 0; font-family: Arial, sans-serif; }
-  #matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #082B4F; z-index: -1; }
+  /* =========================
+     THEME (variáveis)
+     ========================= */
+  :root{
+    --canvas-bg: #082B4F;
+    --canvas-fade: rgba(8,43,79,0.05);
+
+    --login-bg: rgba(255,255,255,0.95);
+    --login-title: #082B4F;
+    --login-subtitle: #082B4F;
+    --text-default: #333;
+
+    --links-bg: rgba(0, 50, 100, 0.95);
+    --links-title: #ddd9ce;
+
+    --admin-bg: #0b3a66;
+
+    --item-bg: #e8f0fe;
+    --item-text: #0b1b2a;
+
+    --primary: #0078D4;
+    --primary-hover: #005fa3;
+
+    --danger: #d9534f;
+    --danger-hover: #c9302c;
+
+    --btn-green: #28a745;
+    --btn-green-hover: #218838;
+  }
+
+  /* =========================
+     THEME DARK (black)
+     ========================= */
+body.theme-dark{
+  /* fundo grafite */
+  --canvas-bg: #0b0f14;                 /* grafite bem escuro */
+  --canvas-fade: rgba(11,15,20,0.18);   /* rastro mais “soft” */
+
+  --login-bg: rgba(18, 22, 28, 0.94);   /* card grafite */
+  --login-title: #e6f0ff;
+  --login-subtitle: #a8c6ff;
+  --text-default: #e7e7e7;
+
+  --links-bg: rgba(16, 20, 26, 0.94);   /* container grafite */
+  --links-title: #e6f0ff;
+
+  --admin-bg: rgba(255,255,255,0.05);
+
+  --item-bg: rgba(255,255,255,0.055);  /* cards mais elegantes */
+  --item-text: #eaf2ff;
+
+  /* neon (azul + ciano + roxo) */
+  --primary: #2dd4ff;                  /* ciano neon */
+  --primary-hover: #0ea5e9;            /* azul neon */
+  
+  --danger: #ff4d6d;                   /* rosa/vermelho neon */
+  --danger-hover: #ff2d55;
+
+  --btn-green: #22c55e;
+  --btn-green-hover: #16a34a;
+}
+
+  /* =========================
+     BASE
+     ========================= */
+  html, body { height: 100%; margin: 0; font-family: Arial, sans-serif; color: var(--text-default); }
+  #matrixCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--canvas-bg); z-index: -1; }
   body { display: flex; justify-content: center; align-items: center; }
 
-  #loginBox { width: 350px; background: rgba(255,255,255,0.95); padding: 20px 15px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); box-sizing: border-box; text-align: center; }
+/* =========================
+   BOTÃO TEMA (canto superior esquerdo)
+   ========================= */
+#themeToggle{
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 10002;
+
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(0,0,0,0.35);
+  color: #fff;
+
+  padding: 6px 10px;           /* 🔽 menor vertical/horizontal */
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 12px;             /* 🔽 levemente menor */
+
+  display: inline-flex;        /* ✅ NÃO estica mais */
+  align-items: center;
+  gap: 6px;                    /* 🔽 espaço menor entre ícone/texto */
+  width: auto;                 /* ✅ largura automática */
+  white-space: nowrap;         /* ✅ impede quebrar linha */
+
+  user-select: none;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+#themeToggle:hover{
+  background: rgba(0,0,0,0.50);
+}
+
+  /* =========================
+     LOGIN
+     ========================= */
+  #loginBox { width: 350px; background: var(--login-bg); padding: 20px 15px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.25); box-sizing: border-box; text-align: center; }
   #loginBox img { width: 200px; margin-bottom: 10px; }
-  #loginBox h3 { margin: 5px 0 15px 0; font-size: 18px; font-weight: 500; color: #082B4F; }
-  #loginBox h2 { margin-bottom: 15px; font-size: 22px; font-weight: 600; color: #082B4F; }
-  #loginBox input { width: 90%; padding: 10px 12px; font-size: 15px; margin-top: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; outline: none; transition: border 0.2s; }
-  #loginBox input:focus { border-color: #0078D4; }
-  #loginBox button { width: 30%; padding: 10px 0; margin: 15px auto 0 auto; font-size: 16px; font-weight: bold; border-radius: 6px; background: #0078D4; color: white; border: none; cursor: pointer; transition: background 0.2s; }
-  #loginBox button:hover { background: #005fa3; }
-  #forgot { margin-top: 10px; font-size: 14px; color: #005fa3; cursor: pointer; text-decoration: underline; }
+  #loginBox h3 { margin: 5px 0 15px 0; font-size: 18px; font-weight: 500; color: var(--login-subtitle); }
+  #loginBox h2 { margin-bottom: 15px; font-size: 22px; font-weight: 600; color: var(--login-title); }
+
+  #loginBox input { width: 90%; padding: 10px 12px; font-size: 15px; margin-top: 10px; border: 1px solid rgba(0,0,0,0.18); border-radius: 6px; box-sizing: border-box; outline: none; transition: border 0.2s; background: rgba(255,255,255,0.92); color: #111; }
+  body.theme-dark #loginBox input{ background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.18); }
+  #loginBox input:focus { border-color: var(--primary); }
+
+  #loginBox button { width: 30%; padding: 10px 0; margin: 15px auto 0 auto; font-size: 16px; font-weight: bold; border-radius: 6px; background: var(--primary); color: white; border: none; cursor: pointer; transition: background 0.2s; }
+  #loginBox button:hover { background: var(--primary-hover); }
+
+  #forgot { margin-top: 10px; font-size: 14px; color: var(--primary); cursor: pointer; text-decoration: underline; }
 
   .password-container { position: relative; width: 100%; margin: 10px auto 0 auto; }
-  .password-container input { width: 100%; padding: 10px 35px 10px 12px; font-size: 15px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
-  .togglePassword { position: absolute; top: 50%; right:20px; transform: translateY(-40%); cursor: pointer; font-size: 18px; color: #555; user-select: none; }
+  .password-container input { width: 100%; padding: 10px 35px 10px 12px; font-size: 15px; border: 1px solid rgba(0,0,0,0.18); border-radius: 6px; box-sizing: border-box; }
+  body.theme-dark .password-container input{ border-color: rgba(255,255,255,0.18); }
+  .togglePassword { position: absolute; top: 50%; right:20px; transform: translateY(-40%); cursor: pointer; font-size: 18px; color: #777; user-select: none; }
+  body.theme-dark .togglePassword{ color: #c7c7c7; }
 
-  #linksBox { position: relative; width: 600px; background: rgba(0, 50, 100, 0.95); padding: 80px 70px 1px 70px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.3); max-height: 560px; overflow-y: auto; display: none; }
-  #linksBox h2 { text-align: center; position: relative; top: -20px; color: #ddd9ce; margin-top: 0; }
+  /* =========================
+     LINKS BOX
+     ========================= */
+  #linksBox { position: relative; width: 600px; background: var(--links-bg); padding: 80px 70px 1px 70px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.3); max-height: 560px; overflow-y: auto; display: none; }
+  #linksBox h2 { text-align: center; position: relative; top: -20px; color: var(--links-title); margin-top: 0; }
 
-  input, button { width: 94%; padding: 12px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
-  button { cursor: pointer; background: #0078D4; color: white; border: none; font-weight: bold; }
-  button:hover { background: #005fa3; }
+  input, button { width: 94%; padding: 12px; margin-top: 10px; border-radius: 5px; border: 1px solid rgba(0,0,0,0.18); font-size: 16px; box-sizing: border-box; }
+  body.theme-dark input, body.theme-dark button{ border-color: rgba(255,255,255,0.18); }
 
-  .item { background: #e8f0fe; padding: 15px; margin-top: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.1s, box-shadow 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  button { cursor: pointer; background: var(--primary); color: white; border: none; font-weight: bold; }
+  button:hover { background: var(--primary-hover); }
+
+  .item { background: var(--item-bg); padding: 15px; margin-top: 10px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.1s, box-shadow 0.2s; display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--item-text); }
   .item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
-  .abrirBtn { background: #0078D4; color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; font-weight: bold; display: flex; align-items: center; white-space: nowrap; }
 
-  #logoutBtn{position: sticky;bottom: 0;left: 0;width: 100%;margin-top: 20px;background: #d9534f;border-radius: 6px;}
-  #logoutBtn:hover { background: #c9302c; }
+  .abrirBtn { background: var(--primary); color: white; padding: 8px 12px; border-radius: 5px; text-decoration: none; font-weight: bold; display: flex; align-items: center; white-space: nowrap; }
+  .abrirBtn:hover { background: var(--primary-hover); }
 
+  #logoutBtn{ position: sticky; bottom: 0; left: 0; width: 100%; margin-top: 20px; background: var(--danger); border-radius: 6px; }
+  #logoutBtn:hover { background: var(--danger-hover); }
+
+  /* =========================
+     VIEWER
+     ========================= */
   #viewerFull { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; }
+  body.theme-dark #viewerFull{ background:#000; }
   #viewerFull iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-  #closeViewer{position:absolute;bottom:5px;left:0;width:100%;padding:17px 0px;background:#082A48;border:none;color:white;font-size:16px;border-radius:0;cursor:pointer;z-index:10000;}
-  #closeViewer:hover { background: #005fa3; }
+
+  #closeViewer{ position:absolute; bottom:5px; left:0; width:100%; padding:17px 0px; background:#082A48; border:none; color:white; font-size:16px; border-radius:0; cursor:pointer; z-index:10000; }
+  body.theme-dark #closeViewer{ background:#111827; }
+  #closeViewer:hover { background: var(--primary-hover); }
 
   #fullscreenBtn { position: fixed; top: -5px; right: 8px; width: 40px; height: 40px; border-radius: 50%; background: rgba(0,0,0,0.4); color: white; border: none; font-size: 18px; cursor: pointer; z-index: 10001; display: flex; justify-content: center; align-items: center; transition: background 0.2s; }
   #fullscreenBtn:hover { background: rgba(0,0,0,0.6); }
 
-  /* Admin panel */
+  /* =========================
+     ADMIN PANEL
+     ========================= */
   #adminPanel{
     display:none;
     margin: 10px 0 20px 0;
     padding: 14px;
-    background:#0b3a66;
+    background: var(--admin-bg);
     color:white;
     border-radius:8px;
+    border: 1px solid rgba(255,255,255,0.12);
   }
+  body.theme-dark #adminPanel{
+    color: var(--text-default);
+  }
+
   #adminPanel h3{ margin: 0 0 10px 0; }
   .adminSection{
     background: rgba(255,255,255,0.10);
@@ -85,41 +213,65 @@
     border:none;
     font-size: 14px;
     box-sizing: border-box;
+    background: rgba(255,255,255,0.92);
+    color: #111;
   }
+  body.theme-dark .adminInput{
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+
   .btnGreen{
     margin-top:12px;
     padding:10px 15px;
     border:none;
     border-radius:6px;
-    background:#28a745;
+    background: var(--btn-green);
     color:white;
     font-weight:bold;
     cursor:pointer;
     width: 100%;
   }
-  .btnGreen:hover{ background:#218838; }
+  .btnGreen:hover{ background: var(--btn-green-hover); }
 
   .btnRed{
     margin-top:8px;
     padding:10px 15px;
     border:none;
     border-radius:6px;
-    background:#d9534f;
+    background: var(--danger);
     color:white;
     font-weight:bold;
     cursor:pointer;
     width: 100%;
   }
-  .btnRed:hover{ background:#c9302c; }
+  .btnRed:hover{ background: var(--danger-hover); }
+
+/* =========================
+   MODO DARK — botão Entrar cinza
+   ========================= */
+body.theme-dark #loginBox button{
+  background: #6c757d !important;   /* cinza grafite */
+  color: #fff;
+}
+
+body.theme-dark #loginBox button:hover{
+  background: #5a6268 !important;   /* hover mais escuro */
+}
+
 </style>
 </head>
 
 <body>
 <canvas id="matrixCanvas"></canvas>
 
+<!-- Botão de tema (somente login) -->
+<button id="themeToggle" type="button" onclick="toggleTheme()">🌓 <span id="themeLabel">Tema: Padrão</span></button>
+
 <div id="loginBox">
   <img src="https://cdn3d.iconscout.com/3d/premium/thumb/microsoft-power-bi-3d-icon-png-download-8500319.png" alt="Logo Pride" style="margin-left: -25px;"> 
-  <h3 style="text-align: center; margin: -30px 0 50px 0; font-size: 20px; font-weight: 600; color: #082B4F;">Dashboards Power BI</h3>
+  <h3 style="text-align: center; margin: -30px 0 50px 0; font-size: 20px; font-weight: 600; color: var(--login-title);">Dashboards Power BI</h3>
   <h2>Login</h2>
   <input id="user" placeholder="Email">
   <div class="password-container">
@@ -167,7 +319,7 @@
     </div>
   </div>
 
-  <!-- Lista de links (usuário vê só o que tem permissão) -->
+  <!-- Lista de links -->
   <div id="listaLinks"></div>
 
   <button id="logoutBtn" onclick="logoutLinks()">Sair</button>
@@ -228,11 +380,38 @@ const ADMIN_EMAIL = "visitante1234@visitante.com";
 // Guarda estado local
 let isAdminGlobal = false;
 
-// ============================
-// ✅ BLOQUEIO (Firestore)
-// Coleção: "bloqueios"
-// Doc ID: email em lowercase
-// ============================
+/* =========================
+   ✅ TEMA (Padrão / Black)
+   - aparece só na tela de login
+   - salva no navegador
+   ========================= */
+function applyTheme(theme){
+  const isDark = (theme === "dark");
+  document.body.classList.toggle("theme-dark", isDark);
+  localStorage.setItem("pbivault_theme", isDark ? "dark" : "light");
+
+  const label = document.getElementById("themeLabel");
+  if (label) label.textContent = isDark ? "Tema: Black" : "Tema: Padrão";
+
+  // força redesenho do matrix com o "fade" do tema
+  // (não precisa reiniciar animação; só muda a cor de preenchimento)
+}
+
+function initTheme(){
+  const saved = localStorage.getItem("pbivault_theme") || "light";
+  applyTheme(saved);
+}
+function toggleTheme(){
+  const current = localStorage.getItem("pbivault_theme") || "light";
+  applyTheme(current === "dark" ? "light" : "dark");
+}
+window.toggleTheme = toggleTheme;
+
+/* =========================
+   ✅ BLOQUEIO (Firestore)
+   Coleção: "bloqueios"
+   Doc ID: email em lowercase
+   ========================= */
 async function estaBloqueado(email) {
   const e = String(email || "").trim().toLowerCase();
   if (!e) return false;
@@ -243,10 +422,7 @@ async function estaBloqueado(email) {
     return snap.exists();
   } catch (err) {
     console.error("Erro ao checar bloqueio:", err);
-    // Em erro, por segurança você pode escolher:
-    // return true;  // (bloqueia tudo se Firestore falhar)
-    // ou:
-    return false;   // (não bloqueia por falha de leitura)
+    return false;
   }
 }
 
@@ -267,7 +443,6 @@ async function bloquearUsuario() {
     alert("Usuário BLOQUEADO!");
     document.getElementById("bloqueioEmail").value = "";
 
-    // Se o admin bloqueou a si mesmo (por engano), derruba o acesso.
     const atual = (auth.currentUser?.email || "").toLowerCase();
     if (atual === email) {
       await signOut(auth);
@@ -301,11 +476,19 @@ function mostrarLoginTela() {
   document.getElementById("loginBox").style.display = "block";
   document.getElementById("adminPanel").style.display = "none";
   isAdminGlobal = false;
+
+  // ✅ botão de tema aparece no login
+  const t = document.getElementById("themeToggle");
+  if (t) t.style.display = "flex";
 }
 
 function mostrarLinksTela() {
   document.getElementById("loginBox").style.display = "none";
   document.getElementById("linksBox").style.display = "block";
+
+  // ✅ botão de tema some depois do login (como você pediu)
+  const t = document.getElementById("themeToggle");
+  if (t) t.style.display = "none";
 }
 
 async function login() {
@@ -313,10 +496,8 @@ async function login() {
   const senha = document.getElementById("pass").value;
 
   try {
-    // tenta logar
     await signInWithEmailAndPassword(auth, email, senha);
 
-    // ✅ checa bloqueio logo após autenticar
     const user = auth.currentUser;
     const userEmail = (user?.email || "").toLowerCase();
 
@@ -338,10 +519,7 @@ async function login() {
 
 async function criarUsuario() {
   const email = document.getElementById("novoEmail").value.trim().toLowerCase();
-  if (!email) {
-    alert("Digite o email do usuário.");
-    return;
-  }
+  if (!email) return alert("Digite o email do usuário.");
 
   const senhaTemp = Math.random().toString(36).slice(2) + "A1!";
 
@@ -373,19 +551,13 @@ async function criarUsuario() {
 }
 
 async function cadastrarLinkAdmin() {
-  if (!isAdminGlobal) {
-    alert("Apenas o admin pode cadastrar links.");
-    return;
-  }
+  if (!isAdminGlobal) return alert("Apenas o admin pode cadastrar links.");
 
   const titulo = document.getElementById("linkTitulo").value.trim();
   const link = document.getElementById("linkUrl").value.trim();
   const permitidosRaw = document.getElementById("linkPermitidos").value.trim();
 
-  if (!titulo || !link) {
-    alert("Preencha Título e Link.");
-    return;
-  }
+  if (!titulo || !link) return alert("Preencha Título e Link.");
 
   let permitidos = [];
   if (permitidosRaw) {
@@ -483,12 +655,10 @@ async function mostrarLinks() {
     containerTitulo.appendChild(titulo);
     div.appendChild(containerTitulo);
 
-    // container botões direita
     const botoesDiv = document.createElement("div");
     botoesDiv.style.display = "flex";
     botoesDiv.style.gap = "8px";
 
-    // abrir
     const abrirBtn = document.createElement("a");
     abrirBtn.href = "javascript:void(0)";
     abrirBtn.textContent = "Abrir Relatório";
@@ -496,11 +666,10 @@ async function mostrarLinks() {
     abrirBtn.onclick = () => abrirViewer(l.link);
     botoesDiv.appendChild(abrirBtn);
 
-    // excluir (admin)
     if (isAdminGlobal) {
       const excluirBtn = document.createElement("button");
       excluirBtn.textContent = "Excluir";
-      excluirBtn.style.background = "#d9534f";
+      excluirBtn.style.background = "var(--danger)";
       excluirBtn.style.color = "white";
       excluirBtn.style.border = "none";
       excluirBtn.style.padding = "8px 12px";
@@ -539,10 +708,7 @@ function toggleFullscreen() {
 }
 
 async function excluirLink(id, titulo) {
-  if (!isAdminGlobal) {
-    alert("Apenas o admin pode excluir.");
-    return;
-  }
+  if (!isAdminGlobal) return alert("Apenas o admin pode excluir.");
 
   const ok = confirm(`Excluir o relatório:\n\n"${titulo}" ?`);
   if (!ok) return;
@@ -557,7 +723,9 @@ async function excluirLink(id, titulo) {
   }
 }
 
-// ===== Matrix Background =====
+/* =========================
+   Matrix Background (usa variáveis do tema)
+   ========================= */
 const canvasMatrix = document.getElementById('matrixCanvas');
 const ctx = canvasMatrix.getContext('2d');
 const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()*&^%';
@@ -565,17 +733,31 @@ const fontSize = 18;
 let columns = Math.floor(window.innerWidth / fontSize);
 let drops = Array(columns).fill(0);
 
+function getCssVar(name){
+  return getComputedStyle(document.body).getPropertyValue(name).trim();
+}
+
 function drawMatrix() {
-  ctx.fillStyle = 'rgba(8,43,79,0.05)';
+  // usa fade do tema
+  ctx.fillStyle = getCssVar('--canvas-fade') || 'rgba(8,43,79,0.05)';
   ctx.fillRect(0, 0, canvasMatrix.width, canvasMatrix.height);
 
   for (let i = 0; i < drops.length; i++) {
     const text = letters[Math.floor(Math.random() * letters.length)];
 
     const gradient = ctx.createLinearGradient(0, 0, 0, canvasMatrix.height);
-    gradient.addColorStop(0, '#00f5ff');
-    gradient.addColorStop(0.5, '#00a1ff');
-    gradient.addColorStop(1, '#0078D4');
+
+if (document.body.classList.contains("theme-dark")) {
+  // neon mais “premium” (roxo -> ciano -> azul)
+  gradient.addColorStop(0, '#a855f7');  // roxo neon
+  gradient.addColorStop(0.45, '#22d3ee'); // ciano neon
+  gradient.addColorStop(1, '#60a5fa');  // azul claro neon
+} else {
+      // gradiente original
+      gradient.addColorStop(0, '#00f5ff');
+      gradient.addColorStop(0.5, '#00a1ff');
+      gradient.addColorStop(1, '#0078D4');
+    }
 
     ctx.fillStyle = gradient;
     ctx.font = fontSize + 'px monospace';
@@ -599,10 +781,10 @@ function resizeMatrix() {
 }
 
 window.addEventListener('resize', resizeMatrix);
-resizeMatrix();
-drawMatrix();
 
-// ===== Auth state =====
+/* =========================
+   Auth state
+   ========================= */
 onAuthStateChanged(auth, async (user) => {
   const loginBox = document.getElementById("loginBox");
   const linksBox = document.getElementById("linksBox");
@@ -612,12 +794,14 @@ onAuthStateChanged(auth, async (user) => {
     linksBox.style.display = "none";
     document.getElementById("adminPanel").style.display = "none";
     isAdminGlobal = false;
+
+    const t = document.getElementById("themeToggle");
+    if (t) t.style.display = "flex";
     return;
   }
 
   const userEmail = (user.email || "").toLowerCase();
 
-  // ✅ checa bloqueio sempre que detectar login
   const bloqueado = await estaBloqueado(userEmail);
   if (bloqueado) {
     alert("Seu acesso foi bloqueado. Procure o administrador.");
@@ -632,10 +816,22 @@ onAuthStateChanged(auth, async (user) => {
   isAdminGlobal = (userEmail === ADMIN_EMAIL);
   document.getElementById("adminPanel").style.display = isAdminGlobal ? "block" : "none";
 
+  const t = document.getElementById("themeToggle");
+  if (t) t.style.display = "none";
+
   mostrarLinks();
 });
 
-// ===== Export functions =====
+/* =========================
+   INIT
+   ========================= */
+initTheme();
+resizeMatrix();
+drawMatrix();
+
+/* =========================
+   Exports (para onclick do HTML)
+   ========================= */
 window.login = login;
 window.logoutLinks = logoutLinks;
 window.togglePassword = togglePassword;
@@ -648,7 +844,6 @@ window.criarUsuario = criarUsuario;
 window.cadastrarLinkAdmin = cadastrarLinkAdmin;
 window.excluirLink = excluirLink;
 
-// ✅ novos exports
 window.bloquearUsuario = bloquearUsuario;
 window.desbloquearUsuario = desbloquearUsuario;
 </script>
